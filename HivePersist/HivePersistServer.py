@@ -9,28 +9,26 @@ class HPServerHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     def do_POST(s):
         """ Response to a POST request - We expect the body to be JSON"""
         global g_storeq
-
-        content_len = int(self.headers.getheader('content-length', 0))
-        post_body = self.rfile.read(content_len)
-        
-        g_storeq.put(('post', post_body))
+        content_len = int(s.headers.getheader('content-length', 0))
+        post_body = s.rfile.read(content_len)
+        g_storeq.put(('post', (s.path, post_body)))
 
         response = g_servq.get()
  
         s.send_response(200)
-        self.wfile.write(response)
+        s.end_headers() 
+        s.wfile.write(response)
 
     def do_GET(s):
         global g_storeq
-        content_len = int(self.headers.getheader('content-length', 0))
-        post_body = self.rfile.read(content_len)
         
-        g_storeq.put(('get', post_body))
+        g_storeq.put(('get', s.path))
 
         response = g_servq.get()
  
         s.send_response(200)
-        self.wfile.write(response)
+        s.end_headers()
+        s.wfile.write(response)
 
 
 class HPServer(threading.Thread):
@@ -42,7 +40,7 @@ class HPServer(threading.Thread):
         self.logger = logger
         self.port = port
         g_storeq = storeq
-        g_sevq = servq
+        g_servq = servq
 
         self.stopped = False
         logger.info('Starting Server...')
