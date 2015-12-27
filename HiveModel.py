@@ -1,34 +1,25 @@
-import shelve
-import os
+import urllib2
+import requests
 from mod_python import apache
 
-def try_data_store(path):
-    true_path = os.path.dirname(os.path.realpath(__file__)) + "/../data" + path
-    return os.path.isdir(true_path)
-        
+def get_data_store(path):
+    return urllib2.urlopen("http://localhost:1337/" + path).read()  
+def put_data_store(path, pdata):
+    data = requests.post("http://localhost:1337/" + path, data=pdata)
+
+    return data.text
 
 class ModelRetrieve:
     
     def go(path):
-        response = "ModelRetrieve: Getting " + path + "..."
-        
-        if try_data_store(path):
-            response += "\n\tFound data store"
-        else:
-            response += "\n\tData store not found"
-            response += ": " + path 
+        response = get_data_store(path) 
         return response
     go = staticmethod(go)
 
 class ModelUpdate:
     
-    def go(path):
-        response = "ModelUpdate: Setting " + path + "..."
-        if try_data_store(path):
-            response += "\n\tFound data store"
-        else:
-            response += "\n\tData store not found"
-            response += ": " + path 
+    def go(path, data):
+        response = put_data_store(path, data)
         return response
     go = staticmethod(go)
 

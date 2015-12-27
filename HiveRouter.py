@@ -32,7 +32,7 @@ class HiveGet(HiveRouter):
             model_response = mr.go(path)
             response = str(model_response)
 
-        return apache.OK, response + "\n\tNot implemented"
+        return apache.OK, response 
 
 class HivePost(HiveRouter):
     def __init__(self, req):
@@ -44,8 +44,8 @@ class HivePost(HiveRouter):
         if not path:
             response = "Nothing to get..."
         else:
-            model_response = mu.go(path)
+            model_response = mu.go(path, self.req.read())
             response = str(model_response)
 
-        return apache.OK, response + "\n\tNot implemented"
+        return apache.OK, response
 
