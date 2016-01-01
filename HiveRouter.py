@@ -6,7 +6,7 @@ def uri_parser(uri):
     if uri.startswith("/api.py"):
         path = uri.split("/api.py")
         if len(path) == 2:
-            return path[1]
+            return path[1].strip("/")
     return None
         
 
@@ -29,7 +29,7 @@ class HiveGet(HiveRouter):
         if not path:
             response = "Nothing to get..."
         else:
-            model_response = mr.go(path)
+            model_response = mr.go(path, self.req)
             response = str(model_response)
 
         return apache.OK, response 
@@ -44,7 +44,7 @@ class HivePost(HiveRouter):
         if not path:
             response = "Nothing to get..."
         else:
-            model_response = mu.go(path, self.req.read())
+            model_response = mu.go(path, self.req.read(), self.req)
             response = str(model_response)
 
         return apache.OK, response
